@@ -31,6 +31,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
+      - run: 'mvn install:install-file -Dfile=/opt/opencv-3.4.2/build/bin/opencv-342.jar -DgroupId=org.opencv -DartifactId=opencv -Dversion=3.4.2 -Dpackaging=jar'
       - run: mvn package
       - run: ./src/main/scripts/startup.sh
 
