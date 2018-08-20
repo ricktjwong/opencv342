@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:9.4.0
+      - image: docker:stable-git
       - image: circleci/openjdk:8-jdk
       - image: ricktjwong/docker-java-opencv
       
