@@ -23,7 +23,16 @@ jobs:
     
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
 
       - run: sudo docker run --name docker_opencv -it -d --mount src="$(pwd)/repo",target=/mnt,type=bind ricktjwong/docker-java-opencv
       - run: sudo docker exec docker_opencv bash -c 'cd /opt/opencv-3.4.2/build && mvn install:install-file -Dfile=/opt/opencv-3.4.2/build/bin/opencv-342.jar -DgroupId=org.opencv -DartifactId=opencv -Dversion=3.4.2 -Dpackaging=jar'
