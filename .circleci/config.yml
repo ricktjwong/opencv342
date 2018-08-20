@@ -34,6 +34,10 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y docker-ce
             sudo docker --version
+            systemctl daemon-reload
+            sudo service docker restart
+            sudo service docker status
+            sudo docker run hello-world
       - setup_remote_docker      
       - run:
           name: Mount local repository and install opencv jar to .m2
