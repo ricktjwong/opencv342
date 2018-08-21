@@ -1,13 +1,9 @@
-# Java Maven CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
+# OpenCV Maven CircleCI 2.0 configuration file
 #
 version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      # - image: circleci/openjdk:8-jdk
       - image: ricktjwong/docker-java-opencv:1.0.0
 
     working_directory: ~/repo
@@ -18,13 +14,11 @@ jobs:
     
     steps:
       - checkout
-      - setup_remote_docker
       - run:
           name: Install opencv jar to .m2
           command: |
-            ls -lsa
             cd /opt/opencv-3.4.2/build && mvn install:install-file -Dfile=/opt/opencv-3.4.2/build/bin/opencv-342.jar -DgroupId=org.opencv -DartifactId=opencv -Dversion=3.4.2 -Dpackaging=jar
       - run: 
           name: Maven tests
           command: | 
-            cd ~/repo && mvn package
+            cd ~/repo && mvn test
