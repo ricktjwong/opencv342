@@ -54,7 +54,6 @@
             <groupId>org.opencv</groupId>
             <artifactId>opencv</artifactId>
             <version>3.4.2</version>
-            <!-- <scope>provided</scope> -->
         </dependency>
 
         <dependency>

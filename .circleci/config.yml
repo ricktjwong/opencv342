@@ -4,7 +4,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: ricktjwong/docker-java-opencv:1.0.0
+      - image: ricktjwong/docker-java-opencv:1.0.2
 
     working_directory: ~/repo
 
@@ -14,11 +14,8 @@ jobs:
     
     steps:
       - checkout
-      - run:
-          name: Install opencv jar to .m2
-          command: |
-            cd /opt/opencv-3.4.2/build && mvn install:install-file -Dfile=/opt/opencv-3.4.2/build/bin/opencv-342.jar -DgroupId=org.opencv -DartifactId=opencv -Dversion=3.4.2 -Dpackaging=jar
       - run: 
           name: Maven tests
-          command: | 
-            cd ~/repo && mvn test
+          command: |
+            cd ~/repo && mvn package
+            cd ~/repo/target && java -Djava.library.path=/opt/opencv-3.4.2/build/lib -jar pHash-1.0.0.jar
