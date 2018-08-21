@@ -7,8 +7,13 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      # - image: circleci/openjdk:8-jdk
-      - image: ricktjwong/docker-java-opencv:1.0.1
+      - image: circleci/openjdk:8-jdk
+      - image: ricktjwong/docker-java-opencv
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
 
     working_directory: ~/repo
 
@@ -20,11 +25,29 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Install opencv jar to .m2
+          name: Install docker
           command: |
-            ls -lsa
-            cd /opt/opencv-3.4.2/build && mvn install:install-file -Dfile=/opt/opencv-3.4.2/build/bin/opencv-342.jar -DgroupId=org.opencv -DartifactId=opencv -Dversion=3.4.2 -Dpackaging=jar
+            sudo apt-get update --fix-missing
+            sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo apt-key fingerprint 0EBFCD88
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+            sudo apt-get update
+            sudo apt-get install -y docker-ce
+            sudo docker --version
+            sudo nohup docker daemon -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock &
+      - run:
+          name: Mount local repository and install opencv jar to .m2
+          command: |
+            sudo docker run hello-world
+            sudo docker run --name docker_opencv -it -d --mount src="$(pwd)/repo",target=/mnt,type=bind ricktjwong/docker-java-opencv
+            sudo docker exec docker_opencv bash -c 'cd /opt/opencv-3.4.2/build && mvn install:install-file -Dfile=/opt/opencv-3.4.2/build/bin/opencv-342.jar -DgroupId=org.opencv -DartifactId=opencv -Dversion=3.4.2 -Dpackaging=jar'
+      # - run: sudo docker exec docker_opencv bash -c 'cd /mnt && mvn package'
+      # - run: sudo docker exec docker_opencv bash -c 'cd /mnt && java -Djava.library.path=/opt/opencv-3.4.2/build/lib -jar target/pHash-1.0.0.jar'
       - run: 
           name: Maven tests
           command: | 
-            cd ~/repo && mvn package
+            sudo docker exec docker_opencv bash -c 'cd /mnt && mvn test'
+            # destroy docker container
+            sudo docker stop docker_opencv
+            sudo docker rm docker_opencv
